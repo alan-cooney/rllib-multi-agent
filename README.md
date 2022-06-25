@@ -1,2 +1,1 @@
-# rllib-multi-agent
-RLlib Multi Agent Example
+# RLlib Multi Agent Example

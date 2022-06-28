@@ -1,0 +1,15 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools"]
+
+[project]
+dependencies = [
+  "atari_py",
+  "gym[accept-rom-license]",
+  "gym[atari]",
+  "ray[rllib]",
+  "tensorflow",
+  "torch",
+]
+name = "rllib-multi-agent"
+version = "0.0.1"

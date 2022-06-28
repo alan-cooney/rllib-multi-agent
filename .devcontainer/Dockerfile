@@ -14,8 +14,5 @@ RUN apt-get update && apt-get install -y cmake
 # Install setuptools
 RUN pip install build setuptools
 
-# Install package
-CMD pip install .
-
 # Set Python path
 ENV PYTHONPATH="/workspaces/rllib-multi-agent"

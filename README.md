@@ -4,7 +4,7 @@ An example to demonstrate the speed of RlLib.
 
 ## Single agent example
 
-This (at `singleAgent.py`) shows the performance of RlLib with tuned
+This (at `./src/singleAgent.py`) shows the performance of RlLib with tuned
 hyperparameters, solving Cartpole. Key stats are as follows (for hitting a
 reward of 190:
 

@@ -7,9 +7,13 @@ dependencies = [
   "atari_py",
   "gym[accept-rom-license]",
   "gym[atari]",
+  "pettingzoo",
+  "pettingzoo[all]",
+  "pygame",
   "ray[rllib]",
+  "supersuit",
   "tensorflow",
-  "torch",
+  "torch"
 ]
 name = "rllib-multi-agent"
 version = "0.0.1"

@@ -4,5 +4,7 @@
         "donjayamanne.python-extension-pack",
         "njpwerner.autodocstring",
         "stkb.rewrap",
+        "zainchen.json",
+        "yzhang.markdown-all-in-one"
     ]
 }

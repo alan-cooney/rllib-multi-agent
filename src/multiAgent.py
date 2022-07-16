@@ -20,10 +20,12 @@ class CNNModelV2(TorchModelV2, nn.Module):
     https://github.com/Farama-Foundation/PettingZoo/blob/master/tutorials/rllib_pistonball.py_
     """
 
-    def __init__(self, obs_space, act_space, num_outputs, *args, **kwargs):
-        TorchModelV2.__init__(self, obs_space, act_space,
+    def __init__(self, obs_space_config, act_space_config, num_outputs, *args, **kwargs):
+        TorchModelV2.__init__(self, obs_space_config, act_space_config,
                               num_outputs, *args, **kwargs)
+
         nn.Module.__init__(self)
+
         self.model = nn.Sequential(
             nn.Conv2d(3, 32, [8, 8], stride=(4, 4)),
             nn.ReLU(),
@@ -35,6 +37,7 @@ class CNNModelV2(TorchModelV2, nn.Module):
             (nn.Linear(3136, 512)),
             nn.ReLU(),
         )
+
         self.policy_fn = nn.Linear(512, num_outputs)
         self.value_fn = nn.Linear(512, 1)
 
@@ -55,9 +58,6 @@ def env_creator():
     Taken from RlLib example at 
     https://github.com/Farama-Foundation/PettingZoo/blob/master/tutorials/rllib_pistonball.py
     https://towardsdatascience.com/multi-agent-deep-reinforcement-learning-in-15-lines-of-code-using-pettingzoo-e0b963c0820b
-
-    Returns:
-        _type_: 
     """
     env = pistonball_v6.parallel_env(
         n_pistons=20,
@@ -80,7 +80,7 @@ def env_creator():
 
 env_name = "pistonball_v6"
 
-register_env(env_name, lambda config: ParallelPettingZooEnv(
+register_env(env_name, lambda _config: ParallelPettingZooEnv(
     env_creator()))
 
 test_env = ParallelPettingZooEnv(env_creator())
@@ -91,13 +91,15 @@ ModelCatalog.register_custom_model("CNNModelV2", CNNModelV2)
 
 
 def gen_policy(i):
-    config = {
+    """Generate the policy"""
+    model_config = {
         "model": {
             "custom_model": "CNNModelV2",
         },
         "gamma": 0.99,
     }
-    return (None, obs_space, act_space, config)
+
+    return (None, obs_space, act_space, model_config)
 
 
 policies = {"policy_0": gen_policy(0)}
@@ -117,15 +119,23 @@ config = PPOConfig().framework(
     batch_mode="truncate_episodes",
     rollout_fragment_length=512,
     num_envs_per_worker=1,
+    compress_observations=False
 ).training(
     lambda_=0.9,
     use_gae=True,
+    gamma=0.99,
     clip_param=0.4,
     entropy_coeff=0.1,
     vf_loss_coeff=0.25,
     sgd_minibatch_size=64,
     num_sgd_iter=10,
-    lr=2e-05
+    lr=2e-05,
+    train_batch_size=512,
+    grad_clip=None
+).debugging(
+    log_level="ERROR"
+).resources(
+    num_gpus=1
 )
 
 tune.run(

@@ -12,6 +12,7 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 RUN apt-get update && apt-get install -y \
     libsdl2-mixer-dev  \
     cmake \
+    gputils \
     libfreetype6-dev  \
     libjpeg-dev  \
     libportmidi-dev  \

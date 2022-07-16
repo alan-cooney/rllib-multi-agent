@@ -7,11 +7,10 @@ dependencies = [
   "atari_py",
   "gym[accept-rom-license]",
   "gym[atari]",
-  "pettingzoo",
-  "pettingzoo[all]",
-  "pygame",
+  "pettingzoo==1.17.0",
   "ray[rllib]",
   "supersuit",
+  "SuperSuit",
   "tensorflow",
   "torch"
 ]

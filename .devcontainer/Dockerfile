@@ -8,12 +8,20 @@ FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 ARG NODE_VERSION="none"
 RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
 
-# Install dependencies
+# Install dependencies (mostly for pygame)
 RUN apt-get update && apt-get install -y \
+    libsdl2-mixer-dev  \
     cmake \
-    ffmpeg \
-    libsm6 \
-    libxext6 \
+    libfreetype6-dev  \
+    libjpeg-dev  \
+    libportmidi-dev  \
+    libsdl2-dev  \
+    libsdl2-image-dev \
+    libsdl2-ttf-dev  \
+    python3-dev  \
+    python3-numpy \
+    python3-pygame \
+    python3-setuptools  \
     swig
 
 # Install setuptools

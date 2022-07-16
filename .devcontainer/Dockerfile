@@ -12,6 +12,7 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 RUN apt-get update && apt-get install -y \
     libsdl2-mixer-dev  \
     cmake \
+    ffmpeg \
     gputils \
     libfreetype6-dev  \
     libjpeg-dev  \
@@ -23,10 +24,12 @@ RUN apt-get update && apt-get install -y \
     python3-numpy \
     python3-pygame \
     python3-setuptools  \
-    swig
+    swig \
+    xvfb
 
 # Install setuptools
 RUN pip install build setuptools
 
-# Set Python path
-ENV PYTHONPATH="/workspaces/rllib-multi-agent"
+# Set env variables
+ENV PYTHONPATH="/workspaces/rllib-multi-agent" # Python path
+ENV DISPLAY=":99" # Enable X11 virtual graphics server

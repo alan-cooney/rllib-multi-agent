@@ -30,8 +30,10 @@ config = PPOConfig().framework(
 ).rollouts(
     num_rollout_workers=5,
     observation_filter="MeanStdFilter",
+    horizon=1000
 ).environment(
     env="CartPole-v0"
+    # record_env=True
 ).resources(
     # num_gpus=1
 )
@@ -40,9 +42,10 @@ config = PPOConfig().framework(
 # experiments, but here we only have one parameter).
 tune.run(
     "PPO",
+    name="single-player-cartpole",
     checkpoint_at_end=True,
     config=config.to_dict(),
-    local_dir=join(dirname(realpath(__file__)), ".results"),
+    local_dir=join(dirname(realpath(__file__)), "../.results"),
     resume=False,
-    stop={"episode_reward_mean": 190},
+    stop={"episode_reward_mean": 950},
 )

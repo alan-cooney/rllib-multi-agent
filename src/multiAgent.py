@@ -140,11 +140,11 @@ config = PPOConfig().framework(
 
 tune.run(
     "PPO",
-    name="PPO",
+    name="pistonball",
     stop={"timesteps_total": 5000000},
     checkpoint_at_end=True,
     checkpoint_freq=10,
-    local_dir=join(dirname(realpath(__file__)), ".results", "pistonball"),
+    local_dir=join(dirname(realpath(__file__)), "../results"),
     resume=False,
     config=config.to_dict()
 )

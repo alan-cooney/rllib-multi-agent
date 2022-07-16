@@ -8,6 +8,7 @@ dependencies = [
   "gym[accept-rom-license]",
   "gym[atari]",
   "pettingzoo[butterfly]==1.17.0",
+  "pyglet",
   "ray[default,rllib]",
   "supersuit",
   "SuperSuit",

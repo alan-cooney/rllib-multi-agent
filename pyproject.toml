@@ -9,6 +9,7 @@ dependencies = [
   "gym[atari]",
   "pettingzoo==1.17.0",
   "ray[rllib]",
+  "ray[default]",
   "supersuit",
   "SuperSuit",
   "tensorflow",

@@ -48,7 +48,7 @@
 	"remoteUser": "vscode",
 	// Override below to customise your /dev/shm size (useful for large machines)
 	"runArgs": [
-		"--shm-size=100g"
+		"--shm-size=30g"
 	],
 	// Enforce using the free GPU machine (nothing else is this large)
 	"hostRequirements": {

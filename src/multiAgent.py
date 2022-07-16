@@ -1,13 +1,17 @@
+import logging
 from os.path import dirname, join, realpath
 
 import supersuit as ss
 from pettingzoo.butterfly import pistonball_v6
-from ray import tune
+from ray import init, tune
+from ray.rllib.agents.ppo import PPOConfig
 from ray.rllib.env.wrappers.pettingzoo_env import ParallelPettingZooEnv
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.tune.registry import register_env
 from torch import nn
+
+init(configure_logging=True, logging_level=logging.INFO)
 
 
 class CNNModelV2(TorchModelV2, nn.Module):
@@ -100,44 +104,37 @@ policies = {"policy_0": gen_policy(0)}
 
 policy_ids = list(policies.keys())
 
+config = PPOConfig().framework(
+    framework="torch"
+).environment(
+    env=env_name,
+    clip_actions=True
+).multi_agent(
+    policies=policies,
+    policy_mapping_fn=(lambda agent_id: policy_ids[0])
+).rollouts(
+    num_rollout_workers=4,
+    batch_mode="truncate_episodes",
+    rollout_fragment_length=512,
+    num_envs_per_worker=1,
+).training(
+    lambda_=0.9,
+    use_gae=True,
+    clip_param=0.4,
+    entropy_coeff=0.1,
+    vf_loss_coeff=0.25,
+    sgd_minibatch_size=64,
+    num_sgd_iter=10,
+    lr=2e-05
+)
+
 tune.run(
     "PPO",
     name="PPO",
     stop={"timesteps_total": 5000000},
+    checkpoint_at_end=True,
     checkpoint_freq=10,
-    local_dir=join(dirname(realpath(__file__)), ".results"),
+    local_dir=join(dirname(realpath(__file__)), ".results", "pistonball"),
     resume=False,
-    config={
-        # Environment specific
-        "env": env_name,
-        # General
-        "log_level": "ERROR",
-        "framework": "torch",
-        "num_gpus": 1,
-        "num_workers": 4,
-        "num_envs_per_worker": 1,
-        "compress_observations": False,
-        "batch_mode": "truncate_episodes",
-        # 'use_critic': True,
-        "use_gae": True,
-        "lambda": 0.9,
-        "gamma": 0.99,
-        # "kl_coeff": 0.001,
-        # "kl_target": 1000.,
-        "clip_param": 0.4,
-        "grad_clip": None,
-        "entropy_coeff": 0.1,
-        "vf_loss_coeff": 0.25,
-        "sgd_minibatch_size": 64,
-        "num_sgd_iter": 10,  # epoc
-        "rollout_fragment_length": 512,
-        # "train_batch_size": 512,
-        "lr": 2e-05,
-        "clip_actions": True,
-        # Method specific
-        "multiagent": {
-            "policies": policies,
-            "policy_mapping_fn": (lambda agent_id: policy_ids[0]),
-        },
-    },
+    config=config.to_dict()
 )

@@ -50,11 +50,6 @@
 	"runArgs": [
 		"--shm-size=30g"
 	],
-	// Enforce using the free GPU machine (nothing else is this large)
-	"hostRequirements": {
-		"cpus": 6,
-		"memory": "112gb"
-	},
 	// Install all packages
 	"postCreateCommand": "pip install .",
 	// Start the virtual X11 graphics server (so we can record videos)

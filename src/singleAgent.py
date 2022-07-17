@@ -1,12 +1,7 @@
 from os.path import dirname, join, realpath
 
-import ray
-from ray import tune
+from ray import init, tune
 from ray.rllib.agents.ppo import PPOConfig, PPOTrainer
-
-# Initialize ray
-ray.init(configure_logging=False,
-         logging_level="info")
 
 # Model overrides
 # https://github.com/ray-project/ray/blob/master/rllib/tuned_examples/ppo/cartpole-ppo.yaml
@@ -86,6 +81,9 @@ def record_video(last_checkpoint_dir: str) -> None:
 
 
 if __name__ == "__main__":
+    # Initialise ray
+    init(configure_logging=False, logging_level="info")
+
     # Train the model
     checkpoint_dir = train()
 

@@ -1,4 +1,3 @@
-import logging
 from os.path import dirname, join, realpath
 
 import supersuit as ss
@@ -10,8 +9,6 @@ from ray.rllib.models import ModelCatalog
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.tune.registry import register_env
 from torch import nn
-
-init(configure_logging=True, logging_level=logging.INFO)
 
 
 class CNNModelV2(TorchModelV2, nn.Module):
@@ -70,6 +67,7 @@ def env_creator():
         ball_elasticity=1.5,
         max_cycles=125,
     )
+
     env = ss.color_reduction_v0(env, mode="B")
     env = ss.dtype_v0(env, "float32")
     env = ss.resize_v0(env, x_size=84, y_size=84)
@@ -78,23 +76,22 @@ def env_creator():
     return env
 
 
-env_name = "pistonball_v6"
+ENV_NAME = "pistonball_v6"
+EXPERIMENT_NAME = "pistonball"
 
-register_env(env_name, lambda _config: ParallelPettingZooEnv(
+register_env(ENV_NAME, lambda _config: ParallelPettingZooEnv(
     env_creator()))
 
 test_env = ParallelPettingZooEnv(env_creator())
 obs_space = test_env.observation_space
 act_space = test_env.action_space
 
-ModelCatalog.register_custom_model("CNNModelV2", CNNModelV2)
-
 
 def gen_policy(i):
     """Generate the policy"""
     model_config = {
         "model": {
-            "custom_model": "CNNModelV2",
+            "custom_model": CNNModelV2,
         },
         "gamma": 0.99,
     }
@@ -106,11 +103,15 @@ policies = {"policy_0": gen_policy(0)}
 
 policy_ids = list(policies.keys())
 
+video_dir = join(dirname(realpath(__file__)),
+                 "../.videos", EXPERIMENT_NAME)
+
 config = PPOConfig().framework(
     framework="torch"
 ).environment(
-    env=env_name,
-    clip_actions=True
+    env=ENV_NAME,
+    clip_actions=True,
+    record_env=video_dir
 ).multi_agent(
     policies=policies,
     policy_mapping_fn=(lambda agent_id: policy_ids[0])
@@ -131,20 +132,23 @@ config = PPOConfig().framework(
     num_sgd_iter=10,
     lr=2e-05,
     train_batch_size=512,
-    grad_clip=None
-).debugging(
-    log_level="ERROR"
+    grad_clip=None,
 ).resources(
     num_gpus=1
 )
 
-tune.run(
-    "PPO",
-    name="pistonball",
-    stop={"timesteps_total": 5000000},
-    checkpoint_at_end=True,
-    checkpoint_freq=10,
-    local_dir=join(dirname(realpath(__file__)), "../results"),
-    resume=False,
-    config=config.to_dict()
-)
+if __name__ == "__main__":
+    # Initialise ray
+    init(configure_logging=False, logging_level="info")
+
+    # Train the model
+    tune.run(
+        "PPO",
+        name=EXPERIMENT_NAME,
+        stop={"timesteps_total": 5000000},
+        checkpoint_at_end=True,
+        checkpoint_freq=10,
+        local_dir=join(dirname(realpath(__file__)), "../.results"),
+        resume=False,
+        config=config.to_dict()
+    )

@@ -55,7 +55,8 @@
 		"cpus": 6,
 		"memory": "112gb"
 	},
-	// Install all packages and start the virtual X11 graphics server (so we can
-	// record videos)
-	"postCreateCommand": "pip install . && Xvfb :99"
+	// Install all packages
+	"postCreateCommand": "pip install .",
+	// Start the virtual X11 graphics server (so we can record videos)
+	"postAttachCommand": "Xvfb :99"
 }

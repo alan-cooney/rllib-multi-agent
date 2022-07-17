@@ -30,7 +30,7 @@ config = PPOConfig().training(
     train_batch_size=4000,
     vf_loss_coeff=0.01,
 ).rollouts(
-    num_rollout_workers=5,
+    num_rollout_workers=4,
     observation_filter="MeanStdFilter",
     horizon=HORIZON
 ).environment(

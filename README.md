@@ -30,3 +30,6 @@ Cartpole. Key stats are as follows (for hitting a reward of 990):
 ```bash
 python ./src/multiAgent.py
 ```
+
+This takes around 100 iterations to get to a positive score (10 minutes on a
+6-core CPU machine with 1 GPU).
